@@ -585,29 +585,18 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     // Rage from Damage made (only from direct weapon damage)
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
-        uint32 weaponSpeedHitFactor;
         uint32 rage_damage = damage + cleanDamage->absorbed_damage;
 
         switch (cleanDamage->attackType)
         {
             case BASE_ATTACK:
             {
-                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.5f);
-                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
-                    weaponSpeedHitFactor *= 2;
-
-                RewardRage(rage_damage, weaponSpeedHitFactor, true);
-
+                RewardRage(rage_damage, true);
                 break;
             }
             case OFF_ATTACK:
             {
-                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 1.75f);
-                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
-                    weaponSpeedHitFactor *= 2;
-
-                RewardRage(rage_damage, weaponSpeedHitFactor, true);
-
+                RewardRage(rage_damage, true);
                 break;
             }
             case RANGED_ATTACK:
@@ -13390,19 +13379,19 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
     SendMessageToSet(&data, false);
 }
 
-void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
+void Unit::RewardRage(uint32 damage, bool attacker)
 {
     float addRage;
 
-    float rageconversion = ((0.0091107836f * getLevel() * getLevel()) + 3.225598133f * getLevel()) + 4.2652911f;
+    float rageconversion = ((0.0091107836f * getLevel() * getLevel()) + 3.225598133f * getLevel()) + 4.26529106f;
 
-    // Unknown if correct, but lineary adjust rage conversion above level 70
-    if (getLevel() > 70)
-        rageconversion += 13.27f * (getLevel() - 70);
+    // Unknown if correct, but lineary adjust rage conversion above level 60
+    if (getLevel() > 60)
+        rageconversion += 13.27f * (getLevel() - 60);
 
     if (attacker)
     {
-        addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
+        addRage = (damage / rageconversion * 7.5f);
 
         // talent who gave more rage on attack
         AddPctN(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
